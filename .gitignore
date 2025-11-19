@@ -1,0 +1,12 @@
+###! LISTE DES FICHIERS ET DOSSIERS À IGNORER PAR GIT !###
+#/¤$ commenter / une ligne pour désactiver cette règle ¤/
+/vendor/
+.env
+public/assets/images/*
+
+##
+# Ignorer les fihiers images 
+*.png *.jpg *.jpeg *.gif *.svg
+
+
+
