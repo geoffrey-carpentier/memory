@@ -1,18 +1,195 @@
+/* Mise en page générale */
 body {
-  font-family: Arial, sans-serif;
   margin: 0;
-  padding: 0;
+  font-family: "Poppins", sans-serif;
+  background: #111827;
+  color: #f9fafb;
 }
-nav {
-  background: #f4f4f4;
-  padding: 10px;
+
+.memory {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
 }
-nav a {
-  margin-right: 10px;
-  text-decoration: none;
-  color: #333;
+
+.memory__intro,
+.memory__start,
+.memory__board,
+.memory__sidebar .panel {
+  background: #1f2937;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
 }
-main {
-  padding: 20px;
+
+.memory__start {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
-/*!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?§#!?                                                                                  Styles additionnels peuvent être ajoutés ici */
+
+.memory__start label {
+  flex: 1 1 250px;
+  display: flex;
+  flex-direction: column;
+  font-weight: 800;
+}
+
+.memory__start input,
+.memory__start select {
+  margin-top: 0.35rem;
+  padding: 0.65rem;
+  border-radius: 10px;
+  border: 1px solid #374151;
+  background: #111827;
+  color: #f9fafb;
+}
+
+.memory__start button {
+  flex: 1 1 200px;
+  background: #f97316;
+  border: none;
+  border-radius: 10px;
+  color: #111;
+  font-weight: 900;
+  cursor: auto ;
+  transition: transform 0.5s ease;
+}
+
+.memory__start button:hover {
+  transform: rotateZ(10deg) scale(1.15);
+}
+
+.alert {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.alert--error {
+  background: #b91c1c;
+}
+.alert--success {
+  background: #15803d;
+}
+
+.memory__board {
+  grid-column: 1 / span 2;
+}
+
+.board-stats {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+  font-weight: 700;
+}
+
+.board-grid {
+  display: grid;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+/* Adaptation du nombre de colonnes selon la difficulté */
+/* .board-grid[data-total-pairs="3"] {
+  grid-template-columns: repeat(3, 100px);
+}
+.board-grid[data-total-pairs="4"] {
+  grid-template-columns: repeat(4, 100px);
+}
+.board-grid[data-total-pairs="6"] {
+  grid-template-columns: repeat(4, 100px);
+}
+.board-grid[data-total-pairs="8"] {
+  grid-template-columns: repeat(4, 100px);
+}
+.board-grid[data-total-pairs="10"] {
+  grid-template-columns: repeat(5, 100px);
+}
+.board-grid[data-total-pairs="12"] {
+  grid-template-columns: repeat(6, 100px);
+} */
+
+.card {
+  position: relative;
+  width: 100px;
+  height: 140px;
+  border: none;
+  perspective: 1000px;
+  cursor: pointer ;
+  background: transparent;
+}
+
+.card.is-matched {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.card__face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  transition: transform 0.4s;
+}
+
+.card__face--back {
+  background: linear-gradient(145deg, #0ea5e9, #0284c7);
+}
+
+.card__face--front {
+  background: #0f172a;
+  transform: rotateY(180deg);
+  padding: 0.5rem;
+}
+
+.card img {
+  max-width: 100%;
+}
+
+.card.is-flipped .card__face--back {
+  transform: rotateY(180deg);
+}
+
+.card.is-flipped .card__face--front {
+  transform: rotateY(360deg);
+}
+
+.memory__sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.panel ol,
+.panel ul {
+  padding-left: 1.2rem;
+}
+
+.panel li {
+  margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+@media (max-width: 1024px) {
+  .memory {
+    grid-template-columns: 1fr;
+  }
+
+  .memory__board {
+    grid-column: auto;
+  }
+}

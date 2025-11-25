@@ -1,12 +1,22 @@
 ###! LISTE DES FICHIERS ET DOSSIERS À IGNORER PAR GIT !###
-#/¤$ commenter / une ligne pour désactiver cette règle ¤/
-/vendor/
-.env
-public/assets/images/*
 
-##
+## Commenter (#) une ligne pour désactiver la règle associée ##
+
+#? Liste des dossiers à ignorer
+/vendor/
+public/assets/images/*
+.Memory-Help/*
+
+#? Fichiers par type
+
 # Ignorer les fihiers images 
-*.png *.jpg *.jpeg *.gif *.svg
+
+*.png *.jpg *.jpeg *.gif *.svg *.ico *.webp *.bmp *.tiff *.psd 
+
+
+#§ Ignorer les fichiers de configuration d'environnement  §#
+
+.env
 
 
 
