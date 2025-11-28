@@ -58,6 +58,10 @@ CREATE TABLE IF NOT EXISTS game_cards (
 CREATE INDEX idx_games_score ON games (final_score DESC, finished_at DESC);
 CREATE INDEX idx_games_user ON games (user_id, finished_at DESC);
 
+-- Index pour accélérer les classements
+CREATE INDEX idx_games_user_score ON games (user_id, final_score DESC);
+CREATE INDEX idx_games_finished ON games (finished_at DESC);
+
 -- 7) Jeu d’exemples pour la table cards (à adapter selon tes visuels)
 INSERT INTO cards (slug, label, image_path) VALUES
     ('arcane_mage',     'Mage arcanique',        '/assets/img/cards/arcane_mage.png'),
@@ -65,6 +69,12 @@ INSERT INTO cards (slug, label, image_path) VALUES
     ('forest_guardian', 'Gardien sylvestre',     '/assets/img/cards/forest_guardian.png'),
     ('shadow_assassin', 'Assassin de l’ombre',   '/assets/img/cards/shadow_assassin.png'),
     ('stone_golem',     'Golem de pierre',       '/assets/img/cards/stone_golem.png'),
-    ('storm_rider',     'Cavalier de tempête',   '/assets/img/cards/storm_rider.png');
+    ('storm_rider',     'Cavalier de tempête',   '/assets/img/cards/storm_rider.png'),
+    ('water_spirit',    'Esprit de l’eau',       '/assets/img/cards/water_spirit.png'),
+    ('fire_elemental',  'Élémentaire de feu',    '/assets/img/cards/fire_elemental.png'),
+    ('light_paladin',   'Paladin de lumière',    '/assets/img/cards/light_paladin.png'),
+    ('dark_necromancer','Nécromancien des ténèbres','/assets/img/cards/dark_necromancer.png'),
+    ('wind_dancer',    'Danseur du vent',       '/assets/img/cards/wind_dancer.png'),
+    ('earth_shaman',    'Chaman de la terre',    '/assets/img/cards/earth_shaman.png');
 
 -- (Supprime ou remplace ces INSERT selon les thèmes finalement choisis)

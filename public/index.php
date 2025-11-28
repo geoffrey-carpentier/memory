@@ -24,6 +24,8 @@ use Core\Router;
 use App\Controllers\GameController;
 use App\Controllers\HomeController;
 use App\Controllers\ArticleController;
+use App\Controllers\LeaderboardController;
+use App\Controllers\ProfileController;
 
 // Initialisation du routeur
 $router = new Router();
@@ -34,6 +36,8 @@ $router = new Router();
 $router->get('/', GameController::class . '@index');
 $router->post('/start', GameController::class . '@start');
 $router->post('/finish', GameController::class . '@finish');
+$router->get('/ranking', LeaderboardController::class . '@index');
+$router->get('/profile', ProfileController::class . '@index');
 
 // Exécution du routeur :
 // On analyse l'URI et la méthode HTTP pour appeler le contrôleur et la méthode correspondants

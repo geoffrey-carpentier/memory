@@ -24,7 +24,7 @@ class GameModel
             'user_id'       => $data['user_id'],
             'difficulty'    => $data['difficulty'],
             'pairs_total'   => $data['pairs_total'],
-            'time_allocated'=> $data['time_allocated'],
+            'time_allocated' => $data['time_allocated'],
             'status'        => $data['status'] ?? 'in_progress',
         ]);
 
@@ -52,7 +52,7 @@ class GameModel
             'pairs_found'   => $stats['pairs_found'],
             'errors'        => $stats['errors'],
             'time_spent'    => $stats['time_spent'],
-            'time_remaining'=> $stats['time_remaining'],
+            'time_remaining' => $stats['time_remaining'],
             'final_score'   => $stats['final_score'],
             'status'        => $stats['status'] ?? 'finished',
             'id'            => $gameId,
@@ -65,14 +65,19 @@ class GameModel
     public function getTopScores(int $limit = 10): array
     {
         $stmt = Database::getPdo()->prepare(
-            'SELECT g.final_score, g.finished_at, g.difficulty, u.nickname
+            'SELECT 
+                g.final_score, 
+                g.finished_at, 
+                g.difficulty, 
+                u.nickname
              FROM games g
-             JOIN users u ON u.id = g.user_id
-             WHERE g.final_score IS NOT NULL
-             ORDER BY g.final_score DESC, g.finished_at DESC
+             INNER JOIN users u ON u.id = g.user_id
+             WHERE g.status = :status AND g.final_score IS NOT NULL
+             ORDER BY g.final_score DESC, g.finished_at ASC
              LIMIT :limit'
         );
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':status', 'finished', \PDO::PARAM_STR);
+        $stmt->bindValue(':limit', $limit, \PDO::PARAM_INT);
         $stmt->execute();
 
         return $stmt->fetchAll();
@@ -95,5 +100,23 @@ class GameModel
         $stmt->execute();
 
         return $stmt->fetchAll();
+    }
+
+    /**
+     * Statistiques d’un joueur.
+     */
+    public function getUserStats(int $userId): array
+    {
+        $stmt = Database::getPdo()->prepare(
+            'SELECT 
+                COUNT(*) AS games_played,
+                MAX(final_score) AS best_score,
+                AVG(final_score) AS avg_score
+             FROM games
+             WHERE user_id = :user_id AND final_score IS NOT NULL'
+        );
+        $stmt->execute(['user_id' => $userId]);
+
+        return $stmt->fetch() ?: ['games_played' => 0, 'best_score' => null, 'avg_score' => null];
     }
 }

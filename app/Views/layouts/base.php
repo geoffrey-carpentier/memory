@@ -22,7 +22,7 @@
   <!-- Menu de navigation global -->
   <nav>
     <a href="/">Accueil</a> |  
-    <a href="/articles">Articles</a> |  
+    <a href="/top10">Top 10</a> | 
     <a href="/about">À propos</a>
   </nav>
 

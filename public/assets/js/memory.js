@@ -3,29 +3,102 @@
  */
 document.addEventListener("DOMContentLoaded", () => {
   const grid = document.querySelector(".board-grid");
-  if (!grid) return;
+  if (!grid) return; // Pas sur une page de jeu
 
+  // Validation des données du DOM
   const totalPairs = parseInt(grid.dataset.totalPairs, 10);
-  let timeRemaining = parseInt(grid.dataset.time, 10);
-  let pairsFound = 0;
-  let errors = 0;
-  let lockBoard = false;
-  let firstCard = null;
+  const initialTime = parseInt(grid.dataset.time, 10);
 
+  if (isNaN(totalPairs) || isNaN(initialTime)) {
+    console.error("Données de grille invalides.");
+    return;
+  }
+
+  // Sélections DOM
   const statPairs = document.getElementById("stat-pairs");
   const statErrors = document.getElementById("stat-errors");
   const statTimer = document.getElementById("stat-timer");
   const finishForm = document.getElementById("finish-form");
+  const pauseBtn = document.getElementById("pause-btn");
+  const toast = document.getElementById("board-toast");
+
+  if (!finishForm) {
+    console.error("Formulaire de fin introuvable.");
+    return;
+  }
+
+  const messages = {
+    success: [
+      "Bien joué !",
+      "Encore un coup de chance !",
+      "Plus que quelques paires !",
+      "Continue comme ça !",
+    ],
+    fail: [
+      "Raté...",
+      "Essaye encore.",
+      "Pas cette fois.",
+      "Tu peux faire mieux !",
+    ],
+  };
+
+  let timeRemaining = initialTime;
+  let pairsFound = 0;
+  let errors = 0;
+  let lockBoard = false;
+  let firstCard = null;
+  let isPaused = false;
 
   const timerId = setInterval(() => {
-    timeRemaining = Math.max(0, timeRemaining - 1);
-    statTimer.textContent = `Temps restant : ${timeRemaining} s`;
+    if (isPaused) return;
 
-    if (timeRemaining === 0) endGame();
+    timeRemaining = Math.max(0, timeRemaining - 1);
+    if (statTimer) {
+      statTimer.textContent = `Temps restant : ${timeRemaining} s`;
+    }
+
+    if (timeRemaining === 0) {
+      finishForm.querySelector('input[name="result_type"]').value = "timeout";
+      showToast("Tu es lent, beaucoup trop lent...", "fail");
+      endGame();
+    }
   }, 1000);
 
+  // Gestion pause automatique au changement d'onglet
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden && !isPaused) {
+      togglePause(true);
+    }
+  });
+
+  // Raccourci clavier : barre d'espace pour pause
+  document.addEventListener("keydown", (event) => {
+    if (event.code === "Space" && grid.offsetParent !== null) {
+      event.preventDefault();
+      togglePause();
+    }
+  });
+
+  // Bouton pause
+  pauseBtn?.addEventListener("click", togglePause);
+
+  function togglePause(forceState = null) {
+    isPaused = forceState !== null ? forceState : !isPaused;
+
+    if (pauseBtn) {
+      pauseBtn.textContent = isPaused ? "▶ Reprendre" : "⏸ Pause";
+      pauseBtn.setAttribute("aria-pressed", isPaused);
+    }
+
+    grid.classList.toggle("is-paused", isPaused);
+  }
+
+  // Écouteurs sur les cartes
   grid.querySelectorAll(".card").forEach((card) => {
-    card.addEventListener("click", () => handleFlip(card));
+    card.addEventListener("click", () => {
+      if (isPaused || grid.classList.contains("is-paused")) return;
+      handleFlip(card);
+    });
   });
 
   function handleFlip(card) {
@@ -50,13 +123,25 @@ document.addEventListener("DOMContentLoaded", () => {
       firstCard.classList.add("is-matched");
       card.classList.add("is-matched");
       pairsFound++;
-      statPairs.textContent = `Paires trouvées : ${pairsFound} / ${totalPairs}`;
+
+      if (statPairs) {
+        statPairs.textContent = `Paires trouvées : ${pairsFound} / ${totalPairs}`;
+      }
+
+      showToast(randomFrom(messages.success), "success");
       firstCard = null;
 
-      if (pairsFound === totalPairs) endGame();
+      if (pairsFound === totalPairs) {
+        finishForm.querySelector('input[name="result_type"]').value = "win";
+        setTimeout(endGame, 500);
+      }
     } else {
       errors++;
-      statErrors.textContent = `Erreurs : ${errors}`;
+      if (statErrors) {
+        statErrors.textContent = `Erreurs : ${errors}`;
+      }
+
+      showToast(randomFrom(messages.fail), "fail");
       lockBoard = true;
 
       setTimeout(() => {
@@ -64,16 +149,28 @@ document.addEventListener("DOMContentLoaded", () => {
         card.classList.remove("is-flipped");
         firstCard = null;
         lockBoard = false;
-      }, 800);
+      }, 900);
     }
+  }
+
+  function randomFrom(list) {
+    return list[Math.floor(Math.random() * list.length)];
+  }
+
+  function showToast(message, type) {
+    if (!toast) return;
+
+    toast.textContent = message;
+    toast.className = `board-toast board-toast--${type} is-visible`;
+    toast.setAttribute("role", "status");
+
+    setTimeout(() => {
+      toast.classList.remove("is-visible");
+    }, 1000);
   }
 
   function endGame() {
     clearInterval(timerId);
-    updateFormAndSubmit();
-  }
-
-  function updateFormAndSubmit() {
     finishForm.querySelector('input[name="pairs_found"]').value = pairsFound;
     finishForm.querySelector('input[name="errors"]').value = errors;
     finishForm.querySelector('input[name="time_remaining"]').value =
@@ -81,3 +178,5 @@ document.addEventListener("DOMContentLoaded", () => {
     finishForm.submit();
   }
 });
+
+("Continue !");
