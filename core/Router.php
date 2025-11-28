@@ -1,22 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Core;
+
+use App\Controllers\ErrorController; // 👈 Import depuis app\Controllers
 
 /**
  * Classe Router
  * -----------------
  * Gère la définition et la résolution des routes HTTP.
- * Elle mappe une URL donnée à une action de contrôleur (ex: "App\Controllers\HomeController@index").
  */
 class Router
 {
-    /**
-     * Tableau des routes disponibles, classées par méthode HTTP (GET/POST).
-     * Exemple :
-     * [
-     *   'GET' => ['/articles' => 'App\Controllers\ArticleController@index']
-     * ]
-     */
     private array $routes = ['GET' => [], 'POST' => []];
 
     /**
@@ -37,50 +33,57 @@ class Router
      * @param string $uri    URI de la requête (ex: "/articles")
      * @param string $method Méthode HTTP utilisée (GET, POST, etc.)
      */
-    public function dispatch(string $uri, string $method): void
+    public function dispatch(string $uri, string $method = 'GET'): void
     {
-        // On extrait uniquement le chemin (sans paramètres GET ou #ancre)
-        $path = parse_url($uri, PHP_URL_PATH) ?? '/';
+        // Nettoie l'URI (supprime les query strings)
+        $path = parse_url($uri, PHP_URL_PATH);
 
-        // Vérifie si une route correspond à ce chemin pour la méthode demandée
-        foreach ($this->routes[$method] ?? [] as $route => $action) {
-            if ($route === $path) {
-                // Sépare le nom complet du contrôleur et la méthode (notation "Controller@method")
-                [$class, $method] = explode('@', $action);
+        // Cherche la route
+        if (isset($this->routes[$method][$path])) {
+            $this->executeRoute($this->routes[$method][$path]);
+        } else {
+            // Si aucune route ne correspond → 404
+            $errorController = new ErrorController();
+            $errorController->notFound();
+        }
+    }
 
-                // Instancie dynamiquement le contrôleur
-                $controller = new $class();
+    /**
+     * Exécute une route trouvée
+     */
+    private function executeRoute(string $action): void
+    {
+        [$controller, $method] = explode('@', $action);
 
-                // Appelle la méthode du contrôleur
-                $controller->$method();
-                return;
-            }
+        if (!class_exists($controller)) {
+            throw new \Exception("Contrôleur introuvable : {$controller}");
         }
 
-        // Si aucune route trouvée, on renvoie une erreur 404
-        http_response_code(404);
-        echo "404 - Page non trouvée";
+        $instance = new $controller();
+
+        if (!method_exists($instance, $method)) {
+            throw new \Exception("Méthode introuvable : {$controller}@{$method}");
+        }
+
+        $instance->$method();
     }
+
     /**
-    * Ajoute une route HTTP de type POST.
-    * Cette méthode permet de définir un chemin associé à une action
-    * qui sera exécutée lorsqu'une requête POST correspondra à ce chemin.
-    *
-    * @param string $path   Chemin de la route (ex. "/articles")
-    * @param string $action Action à exécuter (ex. "App\Controllers\ArticleController@index")
-    */
+     * Ajoute une route HTTP de type POST.
+     * Cette méthode permet de définir un chemin associé à une action
+     * qui sera exécutée lorsqu'une requête POST correspondra à ce chemin.
+     *
+     * @param string $path   Chemin de la route (ex. "/articles")
+     * @param string $action Action à exécuter (ex. "App\Controllers\ArticleController@index")
+     */
     public function post(string $path, string $action): void
     {
         $this->routes['POST'][$path] = $action;
     }
 }
 
-
-
-// Exemple d'utilisation
-$router = new Router();
-$router->get('/', 'App\\Controllers\\HomeController@index');
-$router->get('/articles', 'App\\Controllers\\ArticleController@index');
-$router->get('/about', 'App\\Controllers\\HomeController@about'); // nouvelle route
-
-
+// // Exemple d'utilisation
+// $router = new Router();
+// $router->get('/', 'App\\Controllers\\HomeController@index');
+// $router->get('/articles', 'App\\Controllers\\ArticleController@index');
+// $router->get('/about', 'App\\Controllers\\HomeController@about'); // nouvelle route

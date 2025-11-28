@@ -3,9 +3,7 @@
 /**
  * filepath: d:\TOOLS\LARAGON\www\memory\app\Views\game\index.php
  * 
- * Vue principale du jeu Memory.
- * Affiche le formulaire de démarrage OU la partie en cours OU le résumé.
- * Pas de classement ici (voir /ranking).
+ * Page d'accueil du jeu Memory
  */
 
 use App\Services\GameRules;
@@ -16,185 +14,180 @@ $currentGame = $_SESSION['current_game'] ?? null;
 $deck        = $currentGame['deck'] ?? [];
 $pairsTotal  = $currentGame['pairs_total'] ?? 0;
 
-// Calcul des dimensions de la grille via service dédié
+// Calcul des dimensions de la grille
 [$columns, $rows] = !empty($pairsTotal) ? GameRules::getGridDimensions($pairsTotal) : [3, 2];
-
-// Résumé de la dernière partie (pour affichage post-partie)
-$lastGameSummary = $_SESSION['last_game_summary'] ?? null;
 ?>
 
 <section class="memory">
-    <!-- === ZONE ALERTES === -->
-    <?php if (!empty($_SESSION['flash_error'])): ?>
-        <div class="alert alert--error" role="alert">
-            <?= htmlspecialchars($_SESSION['flash_error']); ?>
-        </div>
-        <?php unset($_SESSION['flash_error']); ?>
-    <?php endif; ?>
-
-    <?php if (!empty($_SESSION['flash_success'])): ?>
-        <div class="alert alert--success" role="alert">
-            <?= htmlspecialchars($_SESSION['flash_success']); ?>
-        </div>
-        <?php unset($_SESSION['flash_success']); ?>
-    <?php endif; ?>
-
-    <!-- === EN-TÊTE PRINCIPAL === -->
-    <header class="memory__intro">
-        <h1>Memory Time-Attack</h1>
-        <p>Entrez votre pseudo, choisissez la difficulté, jouez !</p>
-    </header>
-
-    <!-- === FORMULAIRE DE DÉMARRAGE (caché si partie en cours) === -->
+    <!-- === SECTION INTRO + FORMULAIRE === -->
     <?php if (!$currentGame): ?>
-        <form class="memory__start" method="post" action="/start">
-            <!-- Protection CSRF : token généré et vérifié côté serveur -->
-            <input type="hidden" name="csrf_token" value="<?= Security::generateCsrfToken(); ?>">
-
-            <label for="nickname">Joueur</label>
-            <input
-                type="text"
-                id="nickname"
-                name="nickname"
-                maxlength="20"
-                placeholder="Votre pseudo..."
-                value="<?= htmlspecialchars($_SESSION['nickname'] ?? ''); ?>"
-                required
-                aria-required="true">
-
-            <label for="difficulty">Difficulté (nombre de paires)</label>
-            <select id="difficulty" name="difficulty" required aria-required="true">
-                <option value="">-- Choisir --</option>
-                <?php foreach ([3, 4, 6, 8, 10, 12] as $pairs): ?>
-                    <option value="<?= $pairs; ?>"><?= $pairs; ?> paires</option>
-                <?php endforeach; ?>
-            </select>
-
-            <button type="submit" class="btn btn--primary">Jouer!</button>
-        </form>
-    <?php endif; ?>
-
-    <!-- === ZONE JEU (visible seulement si partie en cours) === -->
-    <?php if ($currentGame): ?>
-        <section class="memory__board" aria-label="Zone de jeu active">
-            <header>
-                <h2>Partie en cours</h2>
-                <p>
-                    <strong><?= htmlspecialchars($_SESSION['nickname'] ?? 'Joueur'); ?></strong> —
-                    <?= $pairsTotal; ?> paires —
-                    Chrono initial : <?= $currentGame['time_allocated']; ?> s
-                </p>
+        <div class="memory__welcome">
+            <!-- Header intro -->
+            <header class="memory__header">
+                <h1>Memory Time-Attack</h1>
+                <p>Entrez votre pseudo, choisissez la difficulté, jouez !</p>
             </header>
 
-            <!-- Barre de statistiques en temps réel -->
-            <div class="board-stats" aria-live="polite" aria-atomic="true">
-                <span id="stat-pairs" class="stat stat--pairs">
-                    Paires trouvées : 0 / <?= $pairsTotal; ?>
-                </span>
-                <span id="stat-errors" class="stat stat--errors">
-                    Erreurs : 0
-                </span>
-                <span id="stat-timer" class="stat stat--timer">
-                    Temps restant : <?= $currentGame['time_allocated']; ?> s
-                </span>
-                <button
-                    type="button"
-                    id="pause-btn"
-                    class="btn btn--pause"
-                    aria-pressed="false"
-                    title="Pause (barre espace)">
-                    ⏸ Pause
+            <!-- Formulaire de démarrage -->
+            <form class="memory__form" method="post" action="/start">
+                <!-- Protection CSRF -->
+                <input type="hidden" name="csrf_token" value="<?= Security::generateCsrfToken(); ?>">
+
+                <!-- Conteneur flex pour les deux champs -->
+                <div class="form-row">
+                    <!-- Groupe 1 : Pseudo -->
+                    <div class="form-group">
+                        <label for="nickname" class="form-label">Joueur</label>
+                        <input
+                            type="text"
+                            id="nickname"
+                            name="nickname"
+                            class="form-input"
+                            maxlength="20"
+                            placeholder="Votre pseudo..."
+                            value="<?= htmlspecialchars($_SESSION['nickname'] ?? ''); ?>"
+                            required
+                            aria-required="true"
+                            aria-describedby="nickname-hint">
+                        <small id="nickname-hint" class="form-hint">2-20 caractères</small>
+                    </div>
+
+                    <!-- Groupe 2 : Difficulté -->
+                    <div class="form-group">
+                        <label for="difficulty" class="form-label">Difficulté</label>
+                        <select
+                            id="difficulty"
+                            name="difficulty"
+                            class="form-input"
+                            required
+                            aria-required="true"
+                            aria-describedby="difficulty-hint">
+                            <option value="">-- Choisir --</option>
+                            <?php foreach ([3, 4, 6, 8, 10, 12] as $pairs): ?>
+                                <option value="<?= $pairs; ?>"><?= $pairs; ?> paires</option>
+                            <?php endforeach; ?>
+                        </select>
+                        <small id="difficulty-hint" class="form-hint">Nombre de paires</small>
+                    </div>
+                </div>
+
+                <!-- Bouton -->
+                <button type="submit" class="btn btn--primary btn--large btn--block">
+                    🎮 Jouer!
                 </button>
+            </form>
+        </div>
+
+        <!-- === SECTION JEUX EN COURS === -->
+    <?php else: ?>
+        <div class="memory__game-active">
+            <!-- Stats du jeu -->
+            <div class="board-stats">
+                <div class="stat">
+                    <span>Joueur: <strong><?= htmlspecialchars($_SESSION['nickname'] ?? 'Anonyme'); ?></strong></span>
+                </div>
+                <div class="stat">
+                    <span id="stat-pairs">Paires trouvées : 0 / <?= $pairsTotal; ?></span>
+                </div>
+                <div class="stat">
+                    <span id="stat-errors">Erreurs : 0</span>
+                </div>
+                <div class="stat stat--timer">
+                    <span id="stat-timer">Temps restant : <?= GameRules::getTimeAllocated($pairsTotal); ?> s</span>
+                </div>
+                <button type="button" id="pause-btn" class="btn btn--pause">⏸ Pause</button>
             </div>
 
-            <!-- Zone de messages flash (succès/échec paires) -->
-            <div
-                id="board-toast"
-                class="board-toast"
-                aria-live="assertive"
-                aria-atomic="true"
-                role="status"></div>
-
-            <!-- Grille de cartes : dimensions calculées dynamiquement -->
-            <div
-                class="board-grid"
+            <!-- Grille de jeu -->
+            <div class="board-grid"
                 data-total-pairs="<?= $pairsTotal; ?>"
-                data-time="<?= $currentGame['time_allocated'] ?? 0; ?>"
-                style="
-                    grid-template-columns: repeat(<?= $columns; ?>, 110px);
-                    grid-template-rows: repeat(<?= $rows; ?>, 150px);
-                "
-                role="region"
-                aria-label="Grille de jeu">
-                <?php foreach ($deck as $index => $item): ?>
-                    <button
-                        type="button"
-                        class="card"
-                        data-index="<?= $index; ?>"
-                        data-pair="<?= htmlspecialchars($item['pair']); ?>"
-                        aria-label="Carte <?= ($index + 1); ?> sur <?= count($deck); ?>"
-                        tabindex="0">
-                        <!-- Face cachée (dos) -->
-                        <span class="card__face card__face--back" aria-hidden="true">?</span>
+                data-time="<?= GameRules::getTimeAllocated($pairsTotal); ?>"
+                style="grid-template-columns: repeat(<?= $columns; ?>, 1fr);">
 
-                        <!-- Face visible (image) -->
-                        <span class="card__face card__face--front">
-                            <img
-                                src="<?= htmlspecialchars($item['card']['image_path']); ?>"
-                                alt="<?= htmlspecialchars($item['card']['label']); ?>"
-                                loading="lazy">
-                        </span>
+                <?php foreach ($deck as $index => $card):
+                    $cardData = $card['card'];
+                    $imageUrl = $cardData['image'] ?? null;
+                    $emoji = $cardData['emoji'] ?? '❓';
+                ?>
+                    <button class="card" data-pair="<?= htmlspecialchars($card['pair']); ?>">
+                        <div class="card__face card__face--back">🎴</div>
+                        <div class="card__face card__face--front">
+                            <?php if ($imageUrl && file_exists(__DIR__ . '/../../..' . parse_url($imageUrl, PHP_URL_PATH))): ?>
+                                <!-- Si l'image existe, l'afficher -->
+                                <img src="<?= htmlspecialchars($imageUrl); ?>"
+                                    alt="Carte <?= htmlspecialchars($cardData['name'] ?? ''); ?>"
+                                    loading="lazy">
+                            <?php else: ?>
+                                <!-- Sinon, afficher l'emoji en fallback -->
+                                <span class="card__emoji"><?= $emoji; ?></span>
+                            <?php endif; ?>
+                        </div>
                     </button>
                 <?php endforeach; ?>
             </div>
 
-            <!-- Formulaire caché : données envoyées au serveur lors de la fin de partie -->
-            <form id="finish-form" class="finish-form" method="post" action="/finish">
+            <!-- Toast notification -->
+            <div id="board-toast" class="board-toast" role="status" aria-live="polite"></div>
+
+            <!-- Formulaire caché pour la fin de partie -->
+            <form id="finish-form" method="post" action="/finish" style="display: none;">
                 <input type="hidden" name="csrf_token" value="<?= Security::generateCsrfToken(); ?>">
-                <input type="hidden" name="pairs_found" value="0">
-                <input type="hidden" name="errors" value="0">
-                <input type="hidden" name="time_remaining" value="<?= $currentGame['time_allocated']; ?>">
-                <input type="hidden" name="result_type" value="win">
+                <input type="hidden" name="pairs_found" value="">
+                <input type="hidden" name="errors" value="">
+                <input type="hidden" name="time_remaining" value="">
+                <input type="hidden" name="result_type" value="">
             </form>
-        </section>
+        </div>
     <?php endif; ?>
 
-    <!-- === RÉSUMÉ POST-PARTIE (visible si partie terminée) === -->
-    <?php if (!$currentGame && $lastGameSummary): ?>
-        <section class="memory__summary" aria-label="Résumé de la dernière partie">
-            <h2>Résumé de la dernière partie</h2>
+    <!-- === RÉSUMÉ POST-PARTIE === -->
+    <?php if (!empty($_SESSION['last_game_summary']) && !$currentGame): ?>
+        <div class="memory__summary">
+            <h2>
+                <?php
+                $summary = $_SESSION['last_game_summary'];
+                $resultType = $summary['result_type'] ?? 'unknown';
+
+                if ($resultType === 'win') {
+                    echo '🎉 Partie complétée !';
+                } elseif ($resultType === 'timeout') {
+                    echo '⏱️ Temps écoulé !';
+                } else {
+                    echo '📊 Résumé de la partie';
+                }
+                ?>
+            </h2>
+
             <ul class="summary-list">
                 <li>
-                    <span class="summary-label">Score :</span>
-                    <strong class="summary-value"><?= (int) $lastGameSummary['score']; ?> pts</strong>
+                    <span class="summary-label">Score</span>
+                    <span class="summary-value"><?= (int) $summary['score']; ?> pts</span>
                 </li>
                 <li>
-                    <span class="summary-label">Paires trouvées :</span>
-                    <strong class="summary-value">
-                        <?= $lastGameSummary['pairs_found']; ?>/<?= $lastGameSummary['pairs_total']; ?>
-                    </strong>
+                    <span class="summary-label">Paires trouvées</span>
+                    <span class="summary-value">
+                        <?= $summary['pairs_found']; ?> / <?= $summary['pairs_total']; ?>
+                    </span>
                 </li>
                 <li>
-                    <span class="summary-label">Erreurs :</span>
-                    <strong class="summary-value"><?= $lastGameSummary['errors']; ?></strong>
+                    <span class="summary-label">Erreurs</span>
+                    <span class="summary-value"><?= $summary['errors']; ?></span>
                 </li>
                 <li>
-                    <span class="summary-label">Temps restant :</span>
-                    <strong class="summary-value"><?= $lastGameSummary['time_remaining']; ?> s</strong>
+                    <span class="summary-label">Temps restant</span>
+                    <span class="summary-value"><?= $summary['time_remaining']; ?> s</span>
                 </li>
             </ul>
 
             <div class="summary-actions">
-                <a href="/ranking" class="btn btn--secondary">Voir le classement</a>
+                <a href="/leaderboard" class="btn btn--secondary">Voir le classement</a>
                 <a href="/" class="btn btn--primary">Nouvelle partie</a>
             </div>
-        </section>
 
-        <?php unset($_SESSION['last_game_summary']); ?>
+            <?php unset($_SESSION['last_game_summary']); ?>
+        </div>
     <?php endif; ?>
 </section>
 
-<!-- Inclusion du script de jeu uniquement si une partie est en cours -->
-<?php if ($currentGame): ?>
-    <script src="/assets/js/memory.js" defer></script>
-<?php endif; ?>
+<!-- Scripts -->
+<script src="/assets/js/memory.js" defer></script>

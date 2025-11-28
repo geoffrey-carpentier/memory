@@ -86,20 +86,26 @@ class GameModel
     /**
      * Dernières parties d’un joueur (historique profil).
      */
-    public function getUserGames(int $userId, int $limit = 10): array
+    public function getUserGames(int $userId, int $limit = 25): array
     {
         $stmt = Database::getPdo()->prepare(
-            'SELECT final_score, difficulty, errors, time_spent, finished_at
+            'SELECT 
+                id,
+                final_score,
+                difficulty,
+                errors,
+                time_allocated - time_spent AS time_remaining,
+                finished_at
              FROM games
-             WHERE user_id = :user_id AND final_score IS NOT NULL
+             WHERE user_id = :user_id
              ORDER BY finished_at DESC
              LIMIT :limit'
         );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $userId, \PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, \PDO::PARAM_INT);
         $stmt->execute();
 
-        return $stmt->fetchAll();
+        return $stmt->fetchAll() ?: [];
     }
 
     /**
@@ -107,6 +113,13 @@ class GameModel
      */
     public function getUserStats(int $userId): array
     {
+        $cacheKey = "user_stats_{$userId}";
+
+        // Vérifie le cache (session)
+        if (isset($_SESSION[$cacheKey]) && time() - $_SESSION[$cacheKey]['timestamp'] < 300) {
+            return $_SESSION[$cacheKey]['data'];
+        }
+
         $stmt = Database::getPdo()->prepare(
             'SELECT 
                 COUNT(*) AS games_played,
@@ -117,6 +130,14 @@ class GameModel
         );
         $stmt->execute(['user_id' => $userId]);
 
-        return $stmt->fetch() ?: ['games_played' => 0, 'best_score' => null, 'avg_score' => null];
+        $data = $stmt->fetch() ?: ['games_played' => 0, 'best_score' => null, 'avg_score' => null];
+
+        // Cache pendant 5 minutes
+        $_SESSION[$cacheKey] = [
+            'data' => $data,
+            'timestamp' => time(),
+        ];
+
+        return $data;
     }
 }

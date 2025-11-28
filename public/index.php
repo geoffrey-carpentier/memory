@@ -3,6 +3,7 @@
 
 declare(strict_types=1);
 
+// === CONFIGURATION === 
 ini_set('display_errors', '1');
 error_reporting(E_ALL);
 
@@ -15,30 +16,39 @@ error_reporting(E_ALL);
 // require __DIR__ . '/../app/Models/ArticleModel.php';          // Modèle pour la gestion des articles
 
 session_start();
-require_once __DIR__ . "/../vendor/autoload.php"; // Chargement automatique des classes via Composer
+
+// === AUTOLOAD COMPOSER === 
+
+require_once __DIR__ . '/../vendor/autoload.php'; // Chargement automatique des classes via Composer
+
+// === ENV (variables d'environnement) === 
+
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->safeLoad();
 
+// === IMPORTS === 
 // Importation des classes avec namespaces pour éviter les conflits de noms
 use Core\Router;
 use App\Controllers\GameController;
-use App\Controllers\HomeController;
-use App\Controllers\ArticleController;
+//# use App\Controllers\HomeController;
+//# */ use App\Controllers\ArticleController;
 use App\Controllers\LeaderboardController;
 use App\Controllers\ProfileController;
+use Core\ErrorHandler;
 
-// Initialisation du routeur
+ErrorHandler::register();
+
+// === ROUTEUR === 
 $router = new Router();
 
-// Définition des routes de l'application (GET / POST)
+// Routes du jeu
+$router->get('/', 'App\\Controllers\\GameController@index');
+$router->post('/start', 'App\\Controllers\\GameController@start');
+$router->post('/finish', 'App\\Controllers\\GameController@finish');
 
-# $router->get('/about', 'App\\Controllers\\HomeController@about'); // nouvelle route
-$router->get('/', GameController::class . '@index');
-$router->post('/start', GameController::class . '@start');
-$router->post('/finish', GameController::class . '@finish');
-$router->get('/ranking', LeaderboardController::class . '@index');
-$router->get('/profile', ProfileController::class . '@index');
+// Routes classement & profil
+$router->get('/leaderboard', 'App\\Controllers\\LeaderboardController@index'); // ✅ Corriger si 'ranking'
+$router->get('/profile', 'App\\Controllers\\ProfileController@index');
 
-// Exécution du routeur :
-// On analyse l'URI et la méthode HTTP pour appeler le contrôleur et la méthode correspondants
+// Dispatch
 $router->dispatch($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);

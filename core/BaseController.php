@@ -1,4 +1,5 @@
 <?php
+
 namespace Core;
 
 /**
@@ -12,29 +13,32 @@ class BaseController
     /**
      * Méthode de rendu d'une vue
      *
-     * @param string $view   Nom du fichier de la vue (sans extension, ex: "home/index")
+     * @param string $view   Nom du fichier de la vue (ex: "leaderboard/index")
      * @param array  $params Tableau associatif de variables à injecter dans la vue
      *
      * @return void
      */
     protected function render(string $view, array $params = []): void
     {
-        // Transforme les clés du tableau $params en variables utilisables directement dans la vue
-        // Exemple : ['title' => 'Accueil'] devient $title = 'Accueil'
-        extract($params, EXTR_SKIP);
+        // Chemin du fichier de la vue
+        $viewPath = __DIR__ . '/../app/Views/' . $view . '.php';
 
-        // Démarre la temporisation de sortie afin de capturer le contenu généré par la vue
+        // Vérification de l'existence du fichier
+        if (!file_exists($viewPath)) {
+            error_log("Vue introuvable : {$viewPath}");
+            throw new \Exception("Vue introuvable : {$viewPath}");
+        }
+
+        // Extraction des paramètres en variables locales
+        extract($params);
+
+        // Récupération du contenu de la vue
         ob_start();
-
-        // Inclusion de la vue principale (ex: home/index.php)
-        // Les variables extraites plus haut sont accessibles dans cette vue
-        require __DIR__ . '/../app/Views/' . $view . '.php';
-
-        // Récupère le contenu généré par la vue et l'enregistre dans $content
-        // Puis nettoie le tampon
+        include $viewPath;
         $content = ob_get_clean();
 
-        // Inclusion du layout de base, qui va utiliser la variable $content pour afficher la vue
-        require __DIR__ . '/../app/Views/layouts/base.php';
+        // Inclusion du layout principal
+        $layoutPath = __DIR__ . '/../app/Views/layouts/base.php';
+        include $layoutPath;
     }
 }

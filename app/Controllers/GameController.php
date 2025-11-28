@@ -8,6 +8,7 @@ use App\Models\CardModel;
 use App\Services\GameRules;
 use Core\BaseController;
 use Core\Security;
+use Core\Validator;
 
 class GameController extends BaseController
 {
@@ -37,22 +38,20 @@ class GameController extends BaseController
     public function start(): void
     {
         try {
-            // Validation CSRF
-            if (!Security::validateCsrfToken($_POST['csrf_token'] ?? '')) {
-                throw new \Exception('Token CSRF invalide.');
+            $validator = new Validator();
+            $validator
+                ->validateCsrf($_POST['csrf_token'] ?? '')
+                ->validateNickname($_POST['nickname'] ?? '')
+                ->validateDifficulty((int) ($_POST['difficulty'] ?? 0));
+
+            if (!$validator->isValid()) {
+                $_SESSION['flash_error'] = reset($validator->getErrors());
+                header('Location: /');
+                return;
             }
 
             $nickname   = trim($_POST['nickname'] ?? '');
             $difficulty = (int) ($_POST['difficulty'] ?? 0);
-
-            // Validation serveur
-            if (strlen($nickname) < 2 || strlen($nickname) > 20) {
-                throw new \InvalidArgumentException('Pseudo : 2-20 caractères.');
-            }
-
-            if (!GameRules::isValidDifficulty($difficulty)) {
-                throw new \InvalidArgumentException('Difficulté invalide.');
-            }
 
             // Récupère ou crée le joueur
             $user = $this->users->findOrCreate($nickname);
@@ -84,13 +83,9 @@ class GameController extends BaseController
             ];
 
             header('Location: /');
-
-        } catch (\InvalidArgumentException $e) {
-            $_SESSION['flash_error'] = $e->getMessage();
-            header('Location: /');
         } catch (\Exception $e) {
             error_log('GameController::start() - ' . $e->getMessage());
-            $_SESSION['flash_error'] = 'Erreur serveur. Réessaye.';
+            $_SESSION['flash_error'] = 'Erreur serveur.';
             header('Location: /');
         }
     }
@@ -158,7 +153,6 @@ class GameController extends BaseController
                 : "Partie complétée ! Score : {$finalScore} pts";
 
             header('Location: /');
-
         } catch (\Exception $e) {
             error_log('GameController::finish() - ' . $e->getMessage());
             $_SESSION['flash_error'] = 'Erreur lors de la sauvegarde.';

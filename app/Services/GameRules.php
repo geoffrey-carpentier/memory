@@ -1,81 +1,148 @@
 <?php
-// filepath: d:\TOOLS\LARAGON\www\memory\app\Services\GameRules.php
+
+declare(strict_types=1);
+
 namespace App\Services;
 
+/**
+ * Classe GameRules
+ * ----------------
+ * Gère la logique du jeu (génération de deck, calcul de score, etc.)
+ */
 class GameRules
 {
     /**
-     * Mapping : nombre de paires → dimensions grille [colonnes, lignes].
+     * Généère un deck de cartes avec images ou emojis
+     * 
+     * @param int $pairsCount Nombre de paires à générer
+     * @return array Tableau de cartes mélangées
      */
-    private const GRID_DIMENSIONS = [
-        3 => [3, 2],   // 3 paires → 3 × 2
-        4 => [4, 2],   // 4 paires → 4 × 2
-        6 => [4, 3],   // 6 paires → 4 × 3
-        8 => [4, 4],   // 8 paires → 4 × 4
-        10 => [5, 4],  // 10 paires → 5 × 4
-        12 => [6, 4],  // 12 paires → 6 × 4
-    ];
-
-    /**
-     * Retourne [colonnes, lignes] pour un nombre de paires.
-     * @throws \InvalidArgumentException si paires invalide
-     */
-    public static function getGridDimensions(int $pairs): array
+    public static function generateDeck(int $pairsCount): array
     {
-        if (!isset(self::GRID_DIMENSIONS[$pairs])) {
-            throw new \InvalidArgumentException(
-                "Nombre de paires invalide : {$pairs}. Acceptés : " 
-                . implode(', ', array_keys(self::GRID_DIMENSIONS))
-            );
+        // Tableau de cartes disponibles (images PNG)
+        // Les chemins sont relatifs à public/assets/img/cards/
+        $cardAssets = [
+            ['name' => 'card-01', 'image' => '/assets/img/cards/01.png', 'emoji' => '🎨'],
+            ['name' => 'card-02', 'image' => '/assets/img/cards/02.png', 'emoji' => '🎭'],
+            ['name' => 'card-03', 'image' => '/assets/img/cards/03.png', 'emoji' => '🎪'],
+            ['name' => 'card-04', 'image' => '/assets/img/cards/04.png', 'emoji' => '🎬'],
+            ['name' => 'card-05', 'image' => '/assets/img/cards/05.png', 'emoji' => '🎮'],
+            ['name' => 'card-06', 'image' => '/assets/img/cards/06.png', 'emoji' => '🎯'],
+            ['name' => 'card-07', 'image' => '/assets/img/cards/07.png', 'emoji' => '🎲'],
+            ['name' => 'card-08', 'image' => '/assets/img/cards/08.png', 'emoji' => '🎸'],
+            ['name' => 'card-09', 'image' => '/assets/img/cards/09.png', 'emoji' => '🎹'],
+            ['name' => 'card-10', 'image' => '/assets/img/cards/10.png', 'emoji' => '🎺'],
+            ['name' => 'card-11', 'image' => '/assets/img/cards/11.png', 'emoji' => '🎻'],
+            ['name' => 'card-12', 'image' => '/assets/img/cards/12.png', 'emoji' => '🥁'],
+            ['name' => 'card-13', 'image' => '/assets/img/cards/13.png', 'emoji' => '⚽'],
+            ['name' => 'card-14', 'image' => '/assets/img/cards/14.png', 'emoji' => '🏀'],
+            ['name' => 'card-15', 'image' => '/assets/img/cards/15.png', 'emoji' => '🏈'],
+            ['name' => 'card-16', 'image' => '/assets/img/cards/16.png', 'emoji' => '⚾'],
+            ['name' => 'card-17', 'image' => '/assets/img/cards/17.png', 'emoji' => '🎾'],
+            ['name' => 'card-18', 'image' => '/assets/img/cards/18.png', 'emoji' => '🏐'],
+            ['name' => 'card-19', 'image' => '/assets/img/cards/19.png', 'emoji' => '🏉'],
+            ['name' => 'card-20', 'image' => '/assets/img/cards/20.png', 'emoji' => '🥎'],
+            ['name' => 'card-21', 'image' => '/assets/img/cards/21.png', 'emoji' => '🚗'],
+            ['name' => 'card-22', 'image' => '/assets/img/cards/22.png', 'emoji' => '✈️'],
+            ['name' => 'card-23', 'image' => '/assets/img/cards/23.png', 'emoji' => '🚁'],
+            ['name' => 'card-24', 'image' => '/assets/img/cards/24.png', 'emoji' => '🚂'],
+        ];
+
+        // Prend les N premières cartes selon la difficulté
+        $selectedCards = array_slice($cardAssets, 0, $pairsCount);
+
+        // Crée des paires (chaque carte apparaît 2 fois)
+        $pairs = [];
+        foreach ($selectedCards as $index => $card) {
+            // Paire 1
+            $pairs[] = [
+                'pair' => $index,
+                'card' => [
+                    'name' => $card['name'],
+                    'image' => $card['image'],
+                    'emoji' => $card['emoji'],
+                ]
+            ];
+            // Paire 2
+            $pairs[] = [
+                'pair' => $index,
+                'card' => [
+                    'name' => $card['name'],
+                    'image' => $card['image'],
+                    'emoji' => $card['emoji'],
+                ]
+            ];
         }
-        return self::GRID_DIMENSIONS[$pairs];
+
+        // Mélange le deck
+        shuffle($pairs);
+
+        return $pairs;
     }
 
     /**
-     * Valide la difficulté choisie.
+     * Récupère les dimensions de la grille (colonnes x lignes)
      */
-    public static function isValidDifficulty(int $difficulty): bool
+    public static function getGridDimensions(int $pairsCount): array
     {
-        return isset(self::GRID_DIMENSIONS[$difficulty]);
-    }
-
-    /**
-     * Retourne le temps alloué selon la difficulté.
-     */
-    public static function getTimeAllocated(int $pairs): int
-    {
-        return match ($pairs) {
-            3 => 45,
-            4 => 60,
-            6 => 90,
-            8 => 120,
-            10 => 150,
-            12 => 200,
-            default => 90,
+        return match ($pairsCount) {
+            3 => [3, 2],
+            4 => [4, 2],
+            6 => [4, 3],
+            8 => [4, 4],
+            10 => [5, 4],
+            12 => [6, 4],
+            default => [3, 2],
         };
     }
 
     /**
-     * Calcule le score final avec multiplicateur de difficulté.
+     * Temps alloué selon la difficulté
+     */
+    public static function getTimeAllocated(int $pairsCount): int
+    {
+        return match ($pairsCount) {
+            3 => 60,
+            4 => 90,
+            6 => 120,
+            8 => 150,
+            10 => 180,
+            12 => 210,
+            default => 60,
+        };
+    }
+
+    /**
+     * Calcule le score final
      */
     public static function computeScore(
         int $pairsFound,
         int $errors,
         int $timeRemaining,
-        int $pairsTotal = 3
+        int $difficulty
     ): int {
-        $base = ($pairsFound * 100) + ($timeRemaining * 10) - ($errors * 25);
+        // Score de base selon les paires trouvées
+        $baseScore = $pairsFound * 100;
 
-        $multipliers = [
+        // Bonus/malus erreurs
+        $errorPenalty = $errors * 10;
+
+        // Bonus temps restant
+        $timeBonus = (int)($timeRemaining * 2);
+
+        // Multiplicateur difficulté
+        $difficultyMultiplier = match ($difficulty) {
             3 => 1.0,
-            4 => 1.2,
-            6 => 1.4,
-            8 => 1.6,
+            4 => 1.1,
+            6 => 1.3,
+            8 => 1.5,
             10 => 1.8,
             12 => 2.0,
-        ];
+            default => 1.0,
+        };
 
-        $factor = $multipliers[$pairsTotal] ?? 1.0;
-        return (int) round($base * $factor);
+        $finalScore = (int)(($baseScore - $errorPenalty + $timeBonus) * $difficultyMultiplier);
+
+        return max(0, $finalScore); // Score minimum = 0
     }
 }
