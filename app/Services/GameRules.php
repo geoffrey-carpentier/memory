@@ -22,19 +22,19 @@ class GameRules
         // Tableau de cartes disponibles (images PNG)
         // Les chemins sont relatifs à public/assets/img/cards/
         $cardAssets = [
-            ['name' => 'card-01', 'image' => '/assets/img/cards/01.png', 'emoji' => '🎨'],
+            ['name' => 'card-01', 'image' => '/assets/img/cards/01.png', 'emoji' => '🎮'],
             ['name' => 'card-02', 'image' => '/assets/img/cards/02.png', 'emoji' => '🎭'],
-            ['name' => 'card-03', 'image' => '/assets/img/cards/03.png', 'emoji' => '🎪'],
+            ['name' => 'card-03', 'image' => '/assets/img/cards/03.png', 'emoji' => '🚁'],
             ['name' => 'card-04', 'image' => '/assets/img/cards/04.png', 'emoji' => '🎬'],
-            ['name' => 'card-05', 'image' => '/assets/img/cards/05.png', 'emoji' => '🎮'],
+            ['name' => 'card-05', 'image' => '/assets/img/cards/05.png', 'emoji' => '🎨'],
             ['name' => 'card-06', 'image' => '/assets/img/cards/06.png', 'emoji' => '🎯'],
             ['name' => 'card-07', 'image' => '/assets/img/cards/07.png', 'emoji' => '🎲'],
             ['name' => 'card-08', 'image' => '/assets/img/cards/08.png', 'emoji' => '🎸'],
-            ['name' => 'card-09', 'image' => '/assets/img/cards/09.png', 'emoji' => '🎹'],
+            ['name' => 'card-09', 'image' => '/assets/img/cards/09.png', 'emoji' => '⚽'],
             ['name' => 'card-10', 'image' => '/assets/img/cards/10.png', 'emoji' => '🎺'],
             ['name' => 'card-11', 'image' => '/assets/img/cards/11.png', 'emoji' => '🎻'],
             ['name' => 'card-12', 'image' => '/assets/img/cards/12.png', 'emoji' => '🥁'],
-            ['name' => 'card-13', 'image' => '/assets/img/cards/13.png', 'emoji' => '⚽'],
+            ['name' => 'card-13', 'image' => '/assets/img/cards/13.png', 'emoji' => '🎹'],
             ['name' => 'card-14', 'image' => '/assets/img/cards/14.png', 'emoji' => '🏀'],
             ['name' => 'card-15', 'image' => '/assets/img/cards/15.png', 'emoji' => '🏈'],
             ['name' => 'card-16', 'image' => '/assets/img/cards/16.png', 'emoji' => '⚾'],
@@ -44,7 +44,7 @@ class GameRules
             ['name' => 'card-20', 'image' => '/assets/img/cards/20.png', 'emoji' => '🥎'],
             ['name' => 'card-21', 'image' => '/assets/img/cards/21.png', 'emoji' => '🚗'],
             ['name' => 'card-22', 'image' => '/assets/img/cards/22.png', 'emoji' => '✈️'],
-            ['name' => 'card-23', 'image' => '/assets/img/cards/23.png', 'emoji' => '🚁'],
+            ['name' => 'card-23', 'image' => '/assets/img/cards/23.png', 'emoji' => '🎪'],
             ['name' => 'card-24', 'image' => '/assets/img/cards/24.png', 'emoji' => '🚂'],
         ];
 

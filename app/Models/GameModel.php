@@ -98,10 +98,13 @@ class GameModel
                 finished_at
              FROM games
              WHERE user_id = :user_id
+               AND status = :status
+               AND final_score IS NOT NULL
              ORDER BY finished_at DESC
              LIMIT :limit'
         );
         $stmt->bindValue(':user_id', $userId, \PDO::PARAM_INT);
+        $stmt->bindValue(':status', 'finished', \PDO::PARAM_STR); /* Filtre les parties terminées */
         $stmt->bindValue(':limit', $limit, \PDO::PARAM_INT);
         $stmt->execute();
 

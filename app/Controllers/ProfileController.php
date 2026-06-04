@@ -16,16 +16,31 @@ class ProfileController extends BaseController
 
     public function index(): void
     {
-        if (empty($_SESSION['user_id'])) {
-            $_SESSION['flash_error'] = 'Connecte-toi pour voir ton profil.';
-            header('Location: /login');
+        $userId = $_SESSION['user_id'] ?? null;
+        $nickname = $_SESSION['nickname'] ?? 'Invité'; // Pseudonyme par défaut pour l'affichage
+
+        error_log('ProfileController: User ID from session: ' . ($userId ?? 'NULL'));
+        error_log('ProfileController: Nickname from session: ' . ($nickname ?? 'NULL'));
+
+        if (empty($userId)) {
+            // Si aucun utilisateur n'est en session, afficher la page de profil avec un message invitant à jouer
+            $this->render('profile/index', [
+                'title'   => 'Mon Profil',
+                'nickname' => $nickname,
+                'stats'   => ['games_played' => 0, 'best_score' => 0, 'avg_score' => 0],
+                'history' => [],
+                'message' => 'Veuillez jouer une partie pour créer votre profil et voir vos statistiques.',
+            ]);
             return;
         }
 
-        $stats = $this->games->getUserStats((int) $_SESSION['user_id']); // méthode à ajouter (moyenne, meilleur score…)
-        $history = $this->games->getUserGames((int) $_SESSION['user_id'], 25);
+        // Si un utilisateur est en session, récupérer ses statistiques et son historique
+        $stats = $this->games->getUserStats((int) $userId);
+        $history = $this->games->getUserGames((int) $userId, 25);
 
         $this->render('profile/index', [
+            'title'   => 'Mon Profil',
+            'nickname' => $nickname,
             'stats'   => $stats,
             'history' => $history,
         ]);

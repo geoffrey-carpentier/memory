@@ -4,7 +4,7 @@ namespace App\Controllers;
 
 use App\Models\UserModel;
 use App\Models\GameModel;
-use App\Models\CardModel;
+
 use App\Services\GameRules;
 use Core\BaseController;
 use Core\Security;
@@ -14,13 +14,13 @@ class GameController extends BaseController
 {
     private UserModel $users;
     private GameModel $games;
-    private CardModel $cards;
+    // La dépendance à CardModel n'est plus nécessaire car GameRules gère la génération des cartes.
 
     public function __construct()
     {
         $this->users = new UserModel();
         $this->games = new GameModel();
-        $this->cards = new CardModel();
+        // CardModel n'est plus instancié car GameRules gère la génération des cartes.
     }
 
     /**
@@ -58,6 +58,9 @@ class GameController extends BaseController
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['nickname'] = $user['nickname'];
 
+            error_log('GameController: User ID stored in session after game start: ' . $_SESSION['user_id']);
+            error_log('GameController: Nickname stored in session after game start: ' . $_SESSION['nickname']);
+
             // Détermine le temps alloué
             $timeAllocated = GameRules::getTimeAllocated($difficulty);
 
@@ -70,8 +73,9 @@ class GameController extends BaseController
             ]);
 
             // Tire les cartes et construit la grille mélangée
-            $pairs = $this->cards->pickRandomPairs($difficulty);
-            $deck = $this->buildShuffledDeck($pairs);
+            // Génère le deck de cartes avec la logique du jeu
+            // Le deck contient les paires uniques, dupliquées et mélangées.
+            $deck = GameRules::generateDeck($difficulty);
 
             // Stocke la partie en session
             $_SESSION['current_game'] = [
@@ -160,20 +164,7 @@ class GameController extends BaseController
         }
     }
 
-    /**
-     * Construit la grille de cartes : duplique chaque paire et mélange.
-     */
-    private function buildShuffledDeck(array $pairs): array
-    {
-        $deck = [];
-
-        foreach ($pairs as $card) {
-            $pairId = uniqid('pair_', false);
-            $deck[] = ['pair' => $pairId, 'card' => $card];
-            $deck[] = ['pair' => $pairId, 'card' => $card];
-        }
-
-        shuffle($deck);
-        return $deck;
-    }
+    // La méthode buildShuffledDeck() a été déplacée dans App\Services\GameRules::generateDeck()
+    // pour centraliser la logique de génération du deck.
+    // Elle n'est plus nécessaire ici.
 }

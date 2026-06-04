@@ -47,7 +47,7 @@ $router->post('/start', 'App\\Controllers\\GameController@start');
 $router->post('/finish', 'App\\Controllers\\GameController@finish');
 
 // Routes classement & profil
-$router->get('/leaderboard', 'App\\Controllers\\LeaderboardController@index'); // ✅ Corriger si 'ranking'
+$router->get('/leaderboard', 'App\\Controllers\\LeaderboardController@index');
 $router->get('/profile', 'App\\Controllers\\ProfileController@index');
 
 // Dispatch
