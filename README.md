@@ -2,8 +2,6 @@
 
 Jeu de paires (Memory) en PHP orienté objet, développé en architecture MVC "maison" dans le cadre d'un projet pédagogique. Le joueur choisit une difficulté, retourne les cartes contre la montre, puis retrouve son score dans un classement des 10 meilleurs joueurs et sur sa page de profil personnelle.
 
-Dépôt GitHub : https://github.com/geoffrey-carpentier/memory
-
 ## 🎮 Règles du jeu
 
 - Le joueur choisit un pseudo (2 à 20 caractères) et une difficulté avant de commencer.
@@ -119,3 +117,5 @@ vendor/bin/phpunit tests
 ## 👤 Auteur
 
 Geoffrey Carpentier — projet réalisé dans le cadre de la formation développeur web à La Plateforme_.
+
+Dépôt GitHub : https://github.com/geoffrey-carpentier/memory
