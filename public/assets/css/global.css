@@ -703,60 +703,9 @@ body {
   margin: 0 auto;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-}
-
 .form-group--action {
   grid-column: 1 / -1;
   align-self: flex-end;
-}
-
-/* Labels */
-.form-label {
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: var(--color-text);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-/* Inputs & Selects */
-.form-input {
-  padding: 0.8rem 1rem;
-  border: 2px solid rgba(148, 163, 184, 0.3);
-  border-radius: 10px;
-  background: var(--color-bg-dark);
-  color: var(--color-text);
-  font-size: 1rem;
-  font-family: inherit;
-  transition: all var(--transition-base);
-}
-
-.form-input::placeholder {
-  color: var(--color-text-muted);
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  background: rgba(30, 41, 59, 0.9);
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
-}
-
-.form-input:invalid:not(:placeholder-shown) {
-  border-color: var(--color-error);
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
-}
-
-/* Hints */
-.form-hint {
-  display: block;
-  font-size: 0.8rem;
-  color: var(--color-text-muted);
-  margin-top: -0.2rem;
 }
 
 /* === BOUTONS ÉTENDUS === */
@@ -914,6 +863,24 @@ body {
   box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
 }
 
+.btn--sound {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+  border: 2px solid rgba(148, 163, 184, 0.3);
+  font-size: 0.85rem;
+  padding: 0.6rem 1rem;
+}
+
+.btn--sound:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.btn--sound[aria-pressed="true"] {
+  color: var(--color-text-muted);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
 /* === ALERTES === */
 .alert {
   padding: 1.2rem 1.5rem;
@@ -956,8 +923,50 @@ body {
   flex-shrink: 0;
 }
 
+/* === PAGE 404 === */
+.error-page {
+  text-align: center;
+  max-width: 500px;
+  margin: 4rem auto;
+  padding: 3rem 2rem;
+  background: linear-gradient(
+    135deg,
+    var(--color-bg-card),
+    rgba(30, 41, 59, 0.6)
+  );
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.error-page__code {
+  display: block;
+  font-size: 5rem;
+  font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-primary-light)
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.error-page h1 {
+  margin: 0.5rem 0;
+  font-size: 1.5rem;
+}
+
+.error-page p {
+  color: var(--color-text-muted);
+  margin-bottom: 2rem;
+}
+
 /* === GRILLE DE JEU === */
 .board-grid {
+  --card-size: 150px;
   display: grid;
   gap: 1rem;
   justify-content: center;
@@ -966,12 +975,13 @@ body {
   background: rgba(15, 23, 42, 0.5);
   border-radius: var(--radius-lg);
   border: 1px solid rgba(148, 163, 184, 0.1);
+  overflow-x: auto;
 }
 
 .card {
   position: relative;
-  width: 150px;
-  height: 150px; /* ← Rendre carré */
+  width: var(--card-size);
+  height: var(--card-size);
   padding: 0;
   border: none;
   background: transparent;
@@ -979,6 +989,22 @@ body {
   perspective: 1000px;
   border-radius: var(--radius-card);
   transition: transform var(--transition-fast);
+}
+
+@media (max-width: 900px) {
+  .board-grid {
+    --card-size: 90px;
+    gap: 0.6rem;
+    padding: 1.2rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .board-grid {
+    --card-size: 64px;
+    gap: 0.4rem;
+    padding: 0.75rem;
+  }
 }
 
 .card:hover:not(.is-matched) {
@@ -1010,7 +1036,7 @@ body {
   background: var(--color-card-back);
   color: white;
   box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.2);
-  font-size: 2.5rem;
+  font-size: calc(var(--card-size) * 0.35);
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
@@ -1031,7 +1057,7 @@ body {
 
 /* Emoji fallback */
 .card__emoji {
-  font-size: 5rem;
+  font-size: calc(var(--card-size) * 0.55);
   display: block;
 }
 
@@ -1097,6 +1123,18 @@ body {
   margin-left: auto;
   color: var(--color-primary);
   font-weight: 700;
+}
+
+@media (max-width: 600px) {
+  .board-stats {
+    gap: 0.75rem;
+    padding: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .stat--timer {
+    margin-left: 0;
+  }
 }
 
 /* === TOAST === */

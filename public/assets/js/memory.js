@@ -20,7 +20,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const statTimer = document.getElementById("stat-timer");
   const finishForm = document.getElementById("finish-form");
   const pauseBtn = document.getElementById("pause-btn");
+  const soundBtn = document.getElementById("sound-btn");
   const toast = document.getElementById("board-toast");
+  const sound = window.SoundManager;
 
   if (!finishForm) {
     console.error("Formulaire de fin introuvable.");
@@ -59,6 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (timeRemaining === 0) {
       finishForm.querySelector('input[name="result_type"]').value = "timeout";
+      sound?.timeout();
       showToast("Tu es lent, beaucoup trop lent...", "fail");
       endGame();
     }
@@ -81,6 +84,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Bouton pause
   pauseBtn?.addEventListener("click", togglePause);
+
+  // Bouton son / muet
+  function updateSoundBtn() {
+    if (!soundBtn || !sound) return;
+    const muted = sound.isMuted();
+    soundBtn.textContent = muted ? "🔇 Muet" : "🔊 Son";
+    soundBtn.setAttribute("aria-pressed", String(muted));
+  }
+  updateSoundBtn();
+  soundBtn?.addEventListener("click", () => {
+    sound?.toggleMute();
+    updateSoundBtn();
+  });
 
   function togglePause(forceState = null) {
     isPaused = forceState !== null ? forceState : !isPaused;
@@ -111,6 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     card.classList.add("is-flipped");
+    sound?.flip();
 
     if (!firstCard) {
       firstCard = card;
@@ -128,11 +145,13 @@ document.addEventListener("DOMContentLoaded", () => {
         statPairs.textContent = `Paires trouvées : ${pairsFound} / ${totalPairs}`;
       }
 
+      sound?.match();
       showToast(randomFrom(messages.success), "success");
       firstCard = null;
 
       if (pairsFound === totalPairs) {
         finishForm.querySelector('input[name="result_type"]').value = "win";
+        sound?.win();
         setTimeout(endGame, 500);
       }
     } else {
@@ -141,6 +160,7 @@ document.addEventListener("DOMContentLoaded", () => {
         statErrors.textContent = `Erreurs : ${errors}`;
       }
 
+      sound?.error();
       showToast(randomFrom(messages.fail), "fail");
       lockBoard = true;
 

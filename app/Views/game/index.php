@@ -95,6 +95,7 @@ $pairsTotal  = $currentGame['pairs_total'] ?? 0;
                 <div class="stat stat--timer">
                     <span id="stat-timer">Temps restant : <?= GameRules::getTimeAllocated($pairsTotal); ?> s</span>
                 </div>
+                <button type="button" id="sound-btn" class="btn btn--sound" aria-pressed="false">🔊 Son</button>
                 <button type="button" id="pause-btn" class="btn btn--pause">⏸ Pause</button>
             </div>
 
@@ -191,4 +192,5 @@ $pairsTotal  = $currentGame['pairs_total'] ?? 0;
 </section>
 
 <!-- Scripts -->
+<script src="/assets/js/sound.js" defer></script>
 <script src="/assets/js/memory.js" defer></script>
