@@ -18,7 +18,7 @@ Jeu de paires (Memory) en PHP orienté objet, développé en architecture MVC "m
   |   12   |  6×4   |    210 s     |
 
 - Le jeu se termine dès que toutes les paires sont trouvées (victoire) ou que le temps est écoulé (timeout).
-- **Score** : `(paires trouvées × 100 − erreurs × 10 + temps restant × 2) × multiplicateur de difficulté`. Le multiplicateur augmente avec la difficulté choisie (de ×1 pour 3 paires à ×2 pour 12 paires), afin de récompenser les parties les plus exigeantes. *(Choix de conception assumé : le cahier des charges suggère en exemple un score "coups / paires", mais ce barème à points a été conservé et affiné car il valorise mieux la difficulté et la rapidité.)*
+- **Score** : `(paires trouvées × 100 − erreurs × 10 + temps restant × 2) × multiplicateur de difficulté`. Le multiplicateur augmente avec la difficulté choisie (de ×1 pour 3 paires à ×2 pour 12 paires), afin de récompenser les parties les plus exigeantes.
 
 ## ✨ Fonctionnalités
 
