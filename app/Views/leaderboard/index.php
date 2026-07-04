@@ -97,7 +97,7 @@ use Core\Security;
                             <td class="history__score"><?= (int) $game['final_score']; ?> pts</td>
                             <td><?= (int) $game['difficulty']; ?></td>
                             <td><?= (int) $game['errors']; ?></td>
-                            <td><?= (int) ($game['time_allocated'] - $game['time_spent'] ?? 0); ?> s</td>
+                            <td><?= (int) ($game['time_remaining'] ?? 0); ?> s</td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

@@ -71,7 +71,7 @@ $userGames = $userGames ?? [];
                                     <?= (int) $game['errors']; ?>
                                 </td>
                                 <td class="history__time">
-                                    <?= (int) ($game['time_allocated'] - $game['time_spent'] ?? 0); ?> s
+                                    <?= (int) ($game['time_remaining'] ?? 0); ?> s
                                 </td>
                             </tr>
                         <?php endforeach; ?>

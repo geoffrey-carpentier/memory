@@ -45,7 +45,8 @@ class GameController extends BaseController
                 ->validateDifficulty((int) ($_POST['difficulty'] ?? 0));
 
             if (!$validator->isValid()) {
-                $_SESSION['flash_error'] = reset($validator->getErrors());
+                $errors = $validator->getErrors();
+                $_SESSION['flash_error'] = reset($errors);
                 header('Location: /');
                 return;
             }
@@ -57,9 +58,6 @@ class GameController extends BaseController
             $user = $this->users->findOrCreate($nickname);
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['nickname'] = $user['nickname'];
-
-            error_log('GameController: User ID stored in session after game start: ' . $_SESSION['user_id']);
-            error_log('GameController: Nickname stored in session after game start: ' . $_SESSION['nickname']);
 
             // Détermine le temps alloué
             $timeAllocated = GameRules::getTimeAllocated($difficulty);

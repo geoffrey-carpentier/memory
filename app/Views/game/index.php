@@ -104,18 +104,19 @@ $pairsTotal  = $currentGame['pairs_total'] ?? 0;
                 data-time="<?= GameRules::getTimeAllocated($pairsTotal); ?>"
                 style="grid-template-columns: repeat(<?= $columns; ?>, 1fr);">
 
-                <?php foreach ($deck as $index => $card):
-                    $cardData = $card['card'];
-                    $imageUrl = $cardData['image'] ?? null;
-                    $emoji = $cardData['emoji'] ?? '❓';
+                <?php
+                $publicRoot = __DIR__ . '/../../../public';
+                foreach ($deck as $index => $card):
+                    $imageUrl = $card->image;
+                    $emoji = $card->emoji ?: '❓';
                 ?>
-                    <button class="card" data-pair="<?= htmlspecialchars($card['pair']); ?>">
+                    <button class="card" data-pair="<?= htmlspecialchars((string) $card->pairId); ?>">
                         <div class="card__face card__face--back">🎴</div>
                         <div class="card__face card__face--front">
-                            <?php if ($imageUrl && file_exists(__DIR__ . '/../../..' . parse_url($imageUrl, PHP_URL_PATH))): ?>
+                            <?php if ($imageUrl && file_exists($publicRoot . parse_url($imageUrl, PHP_URL_PATH))): ?>
                                 <!-- Si l'image existe, l'afficher -->
                                 <img src="<?= htmlspecialchars($imageUrl); ?>"
-                                    alt="Carte <?= htmlspecialchars($cardData['name'] ?? ''); ?>"
+                                    alt="Carte <?= htmlspecialchars($card->name); ?>"
                                     loading="lazy">
                             <?php else: ?>
                                 <!-- Sinon, afficher l'emoji en fallback -->

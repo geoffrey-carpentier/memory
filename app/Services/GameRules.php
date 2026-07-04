@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\Card;
+
 /**
  * Classe GameRules
  * ----------------
@@ -12,72 +14,43 @@ namespace App\Services;
 class GameRules
 {
     /**
-     * Généère un deck de cartes avec images ou emojis
-     * 
+     * Génère un deck de cartes Card mélangées.
+     * Les chemins d'images sont relatifs à public/assets/img/cards/
+     *
      * @param int $pairsCount Nombre de paires à générer
-     * @return array Tableau de cartes mélangées
+     * @return Card[] Tableau de cartes mélangées
      */
     public static function generateDeck(int $pairsCount): array
     {
-        // Tableau de cartes disponibles (images PNG)
-        // Les chemins sont relatifs à public/assets/img/cards/
-        $cardAssets = [
-            ['name' => 'card-01', 'image' => '/assets/img/cards/01.png', 'emoji' => '🎮'],
-            ['name' => 'card-02', 'image' => '/assets/img/cards/02.png', 'emoji' => '🎭'],
-            ['name' => 'card-03', 'image' => '/assets/img/cards/03.png', 'emoji' => '🚁'],
-            ['name' => 'card-04', 'image' => '/assets/img/cards/04.png', 'emoji' => '🎬'],
-            ['name' => 'card-05', 'image' => '/assets/img/cards/05.png', 'emoji' => '🎨'],
-            ['name' => 'card-06', 'image' => '/assets/img/cards/06.png', 'emoji' => '🎯'],
-            ['name' => 'card-07', 'image' => '/assets/img/cards/07.png', 'emoji' => '🎲'],
-            ['name' => 'card-08', 'image' => '/assets/img/cards/08.png', 'emoji' => '🎸'],
-            ['name' => 'card-09', 'image' => '/assets/img/cards/09.png', 'emoji' => '⚽'],
-            ['name' => 'card-10', 'image' => '/assets/img/cards/10.png', 'emoji' => '🎺'],
-            ['name' => 'card-11', 'image' => '/assets/img/cards/11.png', 'emoji' => '🎻'],
-            ['name' => 'card-12', 'image' => '/assets/img/cards/12.png', 'emoji' => '🥁'],
-            ['name' => 'card-13', 'image' => '/assets/img/cards/13.png', 'emoji' => '🎹'],
-            ['name' => 'card-14', 'image' => '/assets/img/cards/14.png', 'emoji' => '🏀'],
-            ['name' => 'card-15', 'image' => '/assets/img/cards/15.png', 'emoji' => '🏈'],
-            ['name' => 'card-16', 'image' => '/assets/img/cards/16.png', 'emoji' => '⚾'],
-            ['name' => 'card-17', 'image' => '/assets/img/cards/17.png', 'emoji' => '🎾'],
-            ['name' => 'card-18', 'image' => '/assets/img/cards/18.png', 'emoji' => '🏐'],
-            ['name' => 'card-19', 'image' => '/assets/img/cards/19.png', 'emoji' => '🏉'],
-            ['name' => 'card-20', 'image' => '/assets/img/cards/20.png', 'emoji' => '🥎'],
-            ['name' => 'card-21', 'image' => '/assets/img/cards/21.png', 'emoji' => '🚗'],
-            ['name' => 'card-22', 'image' => '/assets/img/cards/22.png', 'emoji' => '✈️'],
-            ['name' => 'card-23', 'image' => '/assets/img/cards/23.png', 'emoji' => '🎪'],
-            ['name' => 'card-24', 'image' => '/assets/img/cards/24.png', 'emoji' => '🚂'],
+        $cardTemplates = [
+            ['name' => 'joystick',  'image' => '/assets/img/cards/joystick.svg',  'emoji' => '🕹️'],
+            ['name' => 'gamepad',   'image' => '/assets/img/cards/gamepad.svg',   'emoji' => '🎮'],
+            ['name' => 'arcade',    'image' => '/assets/img/cards/arcade.svg',    'emoji' => '👾'],
+            ['name' => 'cartridge', 'image' => '/assets/img/cards/cartridge.svg', 'emoji' => '📼'],
+            ['name' => 'disc',      'image' => '/assets/img/cards/disc.svg',      'emoji' => '💿'],
+            ['name' => 'floppy',    'image' => '/assets/img/cards/floppy.svg',    'emoji' => '💾'],
+            ['name' => 'ghost',     'image' => '/assets/img/cards/ghost.svg',     'emoji' => '👻'],
+            ['name' => 'invader',   'image' => '/assets/img/cards/invader.svg',   'emoji' => '👽'],
+            ['name' => 'dice',      'image' => '/assets/img/cards/dice.svg',      'emoji' => '🎲'],
+            ['name' => 'heart',     'image' => '/assets/img/cards/heart.svg',     'emoji' => '❤️'],
+            ['name' => 'rocket',    'image' => '/assets/img/cards/rocket.svg',    'emoji' => '🚀'],
+            ['name' => 'trophy',    'image' => '/assets/img/cards/trophy.svg',    'emoji' => '🏆'],
         ];
 
-        // Prend les N premières cartes selon la difficulté
-        $selectedCards = array_slice($cardAssets, 0, $pairsCount);
+        // Prend les N premiers modèles selon la difficulté
+        $selectedTemplates = array_slice($cardTemplates, 0, $pairsCount);
 
-        // Crée des paires (chaque carte apparaît 2 fois)
-        $pairs = [];
-        foreach ($selectedCards as $index => $card) {
-            // Paire 1
-            $pairs[] = [
-                'pair' => $index,
-                'card' => [
-                    'name' => $card['name'],
-                    'image' => $card['image'],
-                    'emoji' => $card['emoji'],
-                ]
-            ];
-            // Paire 2
-            $pairs[] = [
-                'pair' => $index,
-                'card' => [
-                    'name' => $card['name'],
-                    'image' => $card['image'],
-                    'emoji' => $card['emoji'],
-                ]
-            ];
+        // Crée des paires de Card (chaque modèle apparaît 2 fois)
+        $deck = [];
+        foreach ($selectedTemplates as $pairId => $template) {
+            $deck[] = new Card($pairId, $template['name'], $template['image'], $template['emoji']);
+            $deck[] = new Card($pairId, $template['name'], $template['image'], $template['emoji']);
         }
 
         // Mélange le deck
-        shuffle($pairs);
+        shuffle($deck);
 
-        return $pairs;
+        return $deck;
     }
 
     /**
