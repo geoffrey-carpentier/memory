@@ -971,11 +971,20 @@ body {
 
 /* === GRILLE DE JEU === */
 .board-grid {
-  /* --cols est fourni en ligne par la vue selon la difficulté (3 à 6 colonnes) */
+  /* --cols/--rows sont fournis en ligne par la vue selon la difficulté (3 à 6 colonnes, 2 à 4 lignes) */
   --cols: 4;
-  /* Taille de carte fluide : s'adapte à la largeur d'écran ET au nombre de colonnes,
-     pour qu'aucune carte ne soit jamais coupée, du mobile au grand écran. */
-  --card-size: clamp(56px, calc((92vw - 6rem) / var(--cols) - 0.75rem), 150px);
+  --rows: 3;
+  /* Taille de carte fluide : contrainte à la fois par la largeur (nombre de colonnes)
+     et par la hauteur (nombre de lignes) disponibles, pour que le plateau occupe toujours
+     sensiblement le même espace, qu'il y ait 3 ou 12 paires, sans jamais déborder ni scroller. */
+  --card-size: clamp(
+    44px,
+    min(
+      calc((92vw - 6rem) / var(--cols) - 0.75rem),
+      calc((78vh - 18rem) / var(--rows) - 0.75rem)
+    ),
+    150px
+  );
   display: grid;
   gap: 0.75rem;
   justify-content: center;
@@ -1040,17 +1049,10 @@ body {
   border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
-/* Image des cartes */
-.card__face--front img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-}
-
-/* Emoji fallback */
+/* Chaque paire se distingue par les couleurs propres de son emoji */
 .card__emoji {
-  font-size: calc(var(--card-size) * 0.55);
+  font-size: calc(var(--card-size) * 0.6);
+  line-height: 1;
   display: block;
 }
 

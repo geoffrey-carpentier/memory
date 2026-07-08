@@ -103,28 +103,18 @@ $pairsTotal  = $currentGame['pairs_total'] ?? 0;
             <div class="board-grid"
                 data-total-pairs="<?= $pairsTotal; ?>"
                 data-time="<?= GameRules::getTimeAllocated($pairsTotal); ?>"
-                style="grid-template-columns: repeat(<?= $columns; ?>, 1fr); --cols: <?= $columns; ?>;">
+                style="grid-template-columns: repeat(<?= $columns; ?>, 1fr); --cols: <?= $columns; ?>; --rows: <?= $rows; ?>;">
 
                 <?php
-                $publicRoot = __DIR__ . '/../../../public';
-                // Chaque paire reçoit une teinte distincte (12 paires max → pas de 30° sur le cercle chromatique)
+                // Chaque paire est distinguée par son emoji : les couleurs natives des emojis
+                // sont bien plus contrastées entre elles qu'une même icône simplement teintée.
                 foreach ($deck as $index => $card):
-                    $imageUrl = $card->image;
                     $emoji = $card->emoji ?: '❓';
-                    $hue = $card->pairId * 30;
                 ?>
                     <button class="card" data-pair="<?= htmlspecialchars((string) $card->pairId); ?>">
-                        <div class="card__face card__face--back">🎴</div>
-                        <div class="card__face card__face--front" style="filter: hue-rotate(<?= $hue; ?>deg);">
-                            <?php if ($imageUrl && file_exists($publicRoot . parse_url($imageUrl, PHP_URL_PATH))): ?>
-                                <!-- Si l'image existe, l'afficher -->
-                                <img src="<?= htmlspecialchars($imageUrl); ?>"
-                                    alt="Carte <?= htmlspecialchars($card->name); ?>"
-                                    loading="lazy">
-                            <?php else: ?>
-                                <!-- Sinon, afficher l'emoji en fallback -->
-                                <span class="card__emoji"><?= $emoji; ?></span>
-                            <?php endif; ?>
+                        <div class="card__face card__face--back">?</div>
+                        <div class="card__face card__face--front">
+                            <span class="card__emoji"><?= $emoji; ?></span>
                         </div>
                     </button>
                 <?php endforeach; ?>
