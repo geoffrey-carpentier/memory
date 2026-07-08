@@ -43,15 +43,15 @@ Jeu de paires (Memory) en PHP orienté objet, développé en architecture MVC "m
 ```
 memory/
 ├── app/
-│   ├── Controllers/    # GameController, LeaderboardController, ProfileController, ErrorController
+│   ├── Controllers/     # GameController, LeaderboardController, ProfileController, ErrorController
 │   ├── Models/          # Card, UserModel, GameModel (accès aux données)
 │   ├── Services/        # GameRules : logique métier du jeu (deck, score, grille, chrono)
-│   └── Views/            # Templates PHP (game, leaderboard, profile, errors, layouts)
-├── core/                  # Noyau maison : Router, Database (PDO), BaseController, Security (CSRF), Validator, ErrorHandler
-├── database/              # Script SQL de création de la base (memory.sql)
-├── public/                # Racine web : index.php (point d'entrée unique), assets CSS/JS/images
-├── tests/                 # Tests unitaires PHPUnit
-├── .env.example           # Modèle de configuration de la base de données
+│   └── Views/           # Templates PHP (game, leaderboard, profile, errors, layouts)
+├── core/                # Noyau maison : Router, Database (PDO), BaseController, Security (CSRF), Validator, ErrorHandler
+├── database/            # Script SQL de création de la base (memory.sql)
+├── public/              # Racine web : index.php (point d'entrée unique), assets CSS/JS/images
+├── tests/               # Tests unitaires PHPUnit
+├── .env.example         # Modèle de configuration de la base de données
 └── composer.json
 ```
 

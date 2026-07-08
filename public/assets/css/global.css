@@ -212,6 +212,11 @@ body {
   padding: 0 1rem;
 }
 
+/* Le plateau de jeu a besoin de plus de place que le formulaire d'accueil */
+.memory--playing {
+  max-width: 1400px;
+}
+
 /* === WELCOME SECTION === */
 .memory__welcome {
   display: flex;
@@ -966,12 +971,16 @@ body {
 
 /* === GRILLE DE JEU === */
 .board-grid {
-  --card-size: 150px;
+  /* --cols est fourni en ligne par la vue selon la difficulté (3 à 6 colonnes) */
+  --cols: 4;
+  /* Taille de carte fluide : s'adapte à la largeur d'écran ET au nombre de colonnes,
+     pour qu'aucune carte ne soit jamais coupée, du mobile au grand écran. */
+  --card-size: clamp(56px, calc((92vw - 6rem) / var(--cols) - 0.75rem), 150px);
   display: grid;
-  gap: 1rem;
+  gap: 0.75rem;
   justify-content: center;
   margin: 2rem 0;
-  padding: 2rem;
+  padding: 1.5rem;
   background: rgba(15, 23, 42, 0.5);
   border-radius: var(--radius-lg);
   border: 1px solid rgba(148, 163, 184, 0.1);
@@ -989,22 +998,6 @@ body {
   perspective: 1000px;
   border-radius: var(--radius-card);
   transition: transform var(--transition-fast);
-}
-
-@media (max-width: 900px) {
-  .board-grid {
-    --card-size: 90px;
-    gap: 0.6rem;
-    padding: 1.2rem;
-  }
-}
-
-@media (max-width: 600px) {
-  .board-grid {
-    --card-size: 64px;
-    gap: 0.4rem;
-    padding: 0.75rem;
-  }
 }
 
 .card:hover:not(.is-matched) {

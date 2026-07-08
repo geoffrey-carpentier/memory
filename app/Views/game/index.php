@@ -18,14 +18,14 @@ $pairsTotal  = $currentGame['pairs_total'] ?? 0;
 [$columns, $rows] = !empty($pairsTotal) ? GameRules::getGridDimensions($pairsTotal) : [3, 2];
 ?>
 
-<section class="memory">
+<section class="memory <?= $currentGame ? 'memory--playing' : ''; ?>">
     <!-- === SECTION INTRO + FORMULAIRE === -->
     <?php if (!$currentGame): ?>
         <div class="memory__welcome">
             <!-- Header intro -->
             <header class="memory__header">
-                <h1>Memory Time-Attack</h1>
-                <p>Entrez votre pseudo, choisissez la difficulté, jouez !</p>
+                <h1>Memory</h1>
+                <p>Entrez votre pseudo, selectionnez la difficulté, jouez !</p>
             </header>
 
             <!-- Formulaire de démarrage -->
@@ -103,17 +103,19 @@ $pairsTotal  = $currentGame['pairs_total'] ?? 0;
             <div class="board-grid"
                 data-total-pairs="<?= $pairsTotal; ?>"
                 data-time="<?= GameRules::getTimeAllocated($pairsTotal); ?>"
-                style="grid-template-columns: repeat(<?= $columns; ?>, 1fr);">
+                style="grid-template-columns: repeat(<?= $columns; ?>, 1fr); --cols: <?= $columns; ?>;">
 
                 <?php
                 $publicRoot = __DIR__ . '/../../../public';
+                // Chaque paire reçoit une teinte distincte (12 paires max → pas de 30° sur le cercle chromatique)
                 foreach ($deck as $index => $card):
                     $imageUrl = $card->image;
                     $emoji = $card->emoji ?: '❓';
+                    $hue = $card->pairId * 30;
                 ?>
                     <button class="card" data-pair="<?= htmlspecialchars((string) $card->pairId); ?>">
                         <div class="card__face card__face--back">🎴</div>
-                        <div class="card__face card__face--front">
+                        <div class="card__face card__face--front" style="filter: hue-rotate(<?= $hue; ?>deg);">
                             <?php if ($imageUrl && file_exists($publicRoot . parse_url($imageUrl, PHP_URL_PATH))): ?>
                                 <!-- Si l'image existe, l'afficher -->
                                 <img src="<?= htmlspecialchars($imageUrl); ?>"
